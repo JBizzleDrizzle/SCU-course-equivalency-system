@@ -21,12 +21,27 @@ if ($result->num_rows > 0) {
 if ($_POST['accesscode'] != 1) {
   logToFile("INVALID ACCESS CODE");
 }
+else {
+	logToFile("Invalid access code");
+	redirect('advisorregister.html');
+}
+
+//check email address
+$sql = "SELECT * FROM Advisors A WHERE A.email = '$email'";
+$result = $conn->query($sql);
+if($result->num_rows>0){
+	logToFile("repeat use of email");
+	redirect('advisorregister.html');
+}
+
+//hash password
+$hash= password_hash ($_POST['password'], PASSWORD_BCRYPT);
 
 // Post to database
 $sql = "INSERT INTO Advisors VALUES (".$highestID.", '"
 . $_POST['first_name']."', '".$_POST['last_name']."', '"
 . $_POST['email']."', '"
-. $_POST['password']
+. $hash
 ."')";
 
 if ($conn->query($sql) === TRUE) {
